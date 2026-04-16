@@ -2,10 +2,11 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct
+from datetime import datetime
 import uuid
 
 
-def ingest_document(text: str, source_url: str, title: str):
+def ingest_document(text: str, source_url: str, title: str, updated_at: str = None):
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
         chunk_overlap=50
@@ -20,7 +21,12 @@ def ingest_document(text: str, source_url: str, title: str):
         PointStruct(
             id=str(uuid.uuid4()),
             vector=vector,
-            payload={"text": chunk, "source": source_url, "title": title}
+            payload={
+                "text": chunk,
+                "source": source_url,
+                "title": title,
+                "updated_at": updated_at or datetime.utcnow().isoformat()
+            }
         )
         for chunk, vector in zip(chunks, vectors)
     ]
