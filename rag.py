@@ -19,7 +19,7 @@ def ask(question: str) -> str:
     ])
     sources = list(set([r.payload['source'] for r in results]))
 
-    llm = ChatOpenAI(model="gpt-5")
+    llm = ChatOpenAI(model="gpt-4o")
     response = llm.invoke(f"""
 Відповідай тільки на основі наданого контексту.
 Якщо відповіді немає — скажи про це чесно.
