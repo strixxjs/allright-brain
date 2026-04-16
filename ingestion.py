@@ -9,7 +9,7 @@ import uuid
 def ingest_document(text: str, source_url: str, title: str, updated_at: str = None):
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
-        chunk_overlap=50
+        chunk_overlap=100
     )
     chunks = splitter.split_text(text)
 
