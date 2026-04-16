@@ -11,7 +11,7 @@ All Right Brain збирає знання з Google Docs, Confluence, Slack та
 
 ## Архітектура
 
-![Architecture diagram](architecture.png)
+![Architecture diagram](architecture2.png)
 
 ## Структура проекту
 
