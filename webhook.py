@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from dotenv import load_dotenv
+from rag import ask
 import httpx
 import os
 
@@ -48,3 +49,12 @@ async def handle_drive_change(request: Request):
 
     ingest_document(text, source_url, title)
     return {"status": "reindexed", "file_id": file_id}
+
+@app.post("/ask")
+async def ask_question(request: Request):
+    data = await request.json()
+    question = data.get("question", "")
+    if not question:
+        return {"error": "question is required"}
+    answer = ask(question)
+    return {"answer": answer}
