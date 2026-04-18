@@ -1,7 +1,34 @@
 from fastapi import FastAPI, Request
+from dotenv import load_dotenv
 import httpx
+import os
+
+from ingestion import ingest_document
+
+load_dotenv()
+
+GOOGLE_TOKEN = os.getenv("GOOGLE_TOKEN", "")
 
 app = FastAPI()
+
+
+def extract_text(doc: dict) -> str:
+    """
+    Витягує текст з Google Docs API response.
+    Спрощена реалізація — для концепту.
+    У продакшені потрібно обробляти всі типи елементів
+    (таблиці, зображення, списки, вкладені структури).
+    """
+    text_parts = []
+    for element in doc.get("body", {}).get("content", []):
+        paragraph = element.get("paragraph")
+        if not paragraph:
+            continue
+        for run in paragraph.get("elements", []):
+            text_run = run.get("textRun")
+            if text_run:
+                text_parts.append(text_run.get("content", ""))
+    return "".join(text_parts)
 
 
 @app.post("/webhook/google-drive")
@@ -10,7 +37,6 @@ async def handle_drive_change(request: Request):
     file_id = data.get("fileId")
 
     async with httpx.AsyncClient() as client:
-        # Отримуємо оновлений текст документу
         response = await client.get(
             f"https://docs.googleapis.com/v1/documents/{file_id}",
             headers={"Authorization": f"Bearer {GOOGLE_TOKEN}"}
@@ -20,6 +46,5 @@ async def handle_drive_change(request: Request):
         source_url = f"https://docs.google.com/document/d/{file_id}"
         title = doc["title"]
 
-    # Переіндексовуємо
     ingest_document(text, source_url, title)
     return {"status": "reindexed", "file_id": file_id}

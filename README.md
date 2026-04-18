@@ -23,7 +23,7 @@ All Right Brain збирає знання з Google Docs, Confluence, Slack та
 
 - **Vector DB:** Qdrant
 - **Embeddings:** OpenAI text-embedding-3-small
-- **LLM:** GPT-5
+- **LLM:** GPT-4o
 - **Framework:** FastAPI, LangChain
 - **Джерела фази 1:** Google Docs, Confluence
 - **Джерела фази 2:** Slack, GitHub

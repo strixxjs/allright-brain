@@ -1,14 +1,21 @@
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from qdrant_client import QdrantClient
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
+COLLECTION = os.getenv("QDRANT_COLLECTION", "allright_brain")
 
 
 def ask(question: str) -> str:
-    client = QdrantClient(url="http://localhost:6333")
+    client = QdrantClient(url=QDRANT_URL)
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
     query_vector = embeddings.embed_query(question)
     results = client.search(
-        collection_name="allright_brain",
+        collection_name=COLLECTION,
         query_vector=query_vector,
         limit=3
     )
@@ -31,3 +38,7 @@ def ask(question: str) -> str:
 """)
 
     return f"{response.content}\n\nДжерела: {', '.join(sources)}"
+
+
+if __name__ == "__main__":
+    print(ask("Як оформити відпустку?"))

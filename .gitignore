@@ -1,2 +1,8 @@
+venv/
+.venv/
+.env
 .idea/
-.Identifier
+__pycache__/
+*.pyc
+*.png
+*.Zone.Identifier
