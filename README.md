@@ -3,6 +3,10 @@
 Внутрішня AI-база знань компанії All Right.
 Концепт-реалізація для тестового завдання на позицію Automation Engineer.
 
+## Документація
+
+[📄 Повний опис рішення та архітектури (Google Doc)](https://docs.google.com/document/d/18CLz1yrpGh2dcESVQ0FQ_i0OEqhckRi6CTTyEtRa8ys/edit?usp=sharing)
+
 ## Огляд
 
 All Right Brain збирає знання з Google Docs, Confluence, Slack та GitHub,
