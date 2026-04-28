@@ -1,80 +1,84 @@
 # All Right Brain
 
-Внутрішня AI-база знань компанії All Right.
-Концепт-реалізація для тестового завдання на позицію Automation Engineer.
+Internal AI knowledge base for All Right company.
+Concept implementation for the Automation Engineer position test assignment.
 
-## Документація
+## Documentation
 
-[📄 Повний опис рішення та архітектури (Google Doc)](https://docs.google.com/document/d/18CLz1yrpGh2dcESVQ0FQ_i0OEqhckRi6CTTyEtRa8ys/edit?usp=sharing)
+[📄 Full solution and architecture description (Google Doc)](https://docs.google.com/document/d/18CLz1yrpGh2dcESVQ0FQ_i0OEqhckRi6CTTyEtRa8ys/edit?usp=sharing)
 
-## Огляд
+## Overview
 
-All Right Brain збирає знання з Google Docs, Confluence, Slack та GitHub,
-індексує їх через embeddings і дозволяє будь-кому отримати відповідь з посиланням на джерело
-через Slack-бот, REST API або Web UI.
+All Right Brain collects knowledge from Google Docs, Confluence, Slack and GitHub,
+indexes it via embeddings and allows anyone to get an answer with a reference to the source
+via Slack bot, REST API or Web UI.
 
-## Архітектура
+## Architecture
 
 ![Architecture diagram](architecture2.png)
 
-## Структура проєкту
+## Project Structure
 
-- `ingestion.py` — розбиття документів на чанки, створення embeddings та індексація в Qdrant
-- `rag.py` — семантичний пошук та генерація відповіді з посиланням на джерело
-- `webhook.py` — FastAPI-сервер, який приймає webhook від Google Drive і тригерить переіндексацію
+- `ingestion.py` — document chunking, embeddings creation and indexing to Qdrant
+- `rag.py` — semantic search and answer generation with source references
+- `webhook.py` — FastAPI server that receives Google Drive webhooks and triggers reindexing
 
-## Технології
+## Tech Stack
 
 - **Vector DB:** Qdrant
 - **Embeddings:** OpenAI `text-embedding-3-small`
 - **LLM:** GPT-4o
 - **Framework:** FastAPI, LangChain
-- **Джерела (фаза 1):** Google Docs, Confluence
-- **Джерела (фаза 2):** Slack, GitHub
+- **Phase 1 sources:** Google Docs, Confluence
+- **Phase 2 sources:** Slack, GitHub
 
-## Як це працює
+## How It Works
 
-1. Документ завантажується → розбивається на чанки → перетворюється на embeddings → зберігається в Qdrant
-2. При зміні документу → webhook тригерить автоматичну переіндексацію
-3. Користувач ставить питання → семантичний пошук знаходить релевантні чанки → LLM генерує відповідь з посиланням на джерело
+1. Document is loaded → split into chunks → converted to embeddings → stored in Qdrant
+2. When a document changes → webhook triggers automatic reindexing
+3. User asks a question → semantic search finds relevant chunks → LLM generates answer with source reference
 
-## Як запустити
+## Getting Started
 
 ```bash
-# 1. Клонувати репозиторій
+# 1. Clone the repository
 git clone https://github.com/strixxjs/allright-brain
 cd allright-brain
 
-# 2. Створити та активувати virtual environment
+# 2. Create and activate virtual environment
 python -m venv venv
 source venv/bin/activate          # Linux/macOS
 # venv\Scripts\activate           # Windows
 
-# 3. Встановити залежності
+# 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Заповнити .env
+# 4. Fill in .env
 cp .env.example .env
-# далі відкрий .env і встав реальні ключі
+# Open .env and add your API keys
 
-# 5. Запустити Qdrant у Docker
+# 5. Run Qdrant in Docker
 docker run -p 6333:6333 qdrant/qdrant
 
-# 6. Запустити webhook-сервер
+# 6. Start the webhook server
 uvicorn webhook:app --reload
 ```
 
-Swagger UI буде доступний на `http://127.0.0.1:8000/docs`.
+Swagger UI available at `http://127.0.0.1:8000/docs`.
 
-## Обмеження поточної реалізації
+## Current Limitations
 
-Це концепт, а не production-ready код. Для продакшену потрібно:
+This is a concept, not production-ready code. For production use:
 
-- Винести створення клієнтів (`QdrantClient`, `OpenAIEmbeddings`, `ChatOpenAI`) в синглтони або FastAPI `Depends`
-- Додати retry з exponential backoff для викликів OpenAI та Qdrant (наприклад, через `tenacity`)
-- Замінити `uuid.uuid4()` на детермінований id (`hash(source_url + chunk_index)`) для уникнення дублікатів при переіндексації
-- Додавати логіку видалення старих чанків по `source_url` перед повторним upsert
-- Замінити `datetime.utcnow()` на `datetime.now(timezone.utc)` (перше deprecated у Python 3.12)
-- Створювати колекцію в Qdrant з правильним `vector_size=1536` через `get_or_create_collection`
-- Додати authentication для webhook endpoint
-- Покрити тестами критичні шляхи (ingestion, retrieval)
+- Move client creation (`QdrantClient`, `OpenAIEmbeddings`, `ChatOpenAI`) to singletons or FastAPI `Depends`
+- Add retry with exponential backoff for OpenAI and Qdrant calls (e.g. via `tenacity`)
+- Replace `uuid.uuid4()` with deterministic id (`hash(source_url + chunk_index)`) to avoid duplicates on reindexing
+- Add logic to delete old chunks by `source_url` before re-upsert
+- Replace `datetime.utcnow()` with `datetime.now(timezone.utc)` (deprecated in Python 3.12)
+- Create Qdrant collection with correct `vector_size=1536` via `get_or_create_collection`
+- Add authentication for webhook endpoint
+- Cover critical paths with tests (ingestion, retrieval)
+
+## Note
+
+This is a concept implementation, not production-ready code.
